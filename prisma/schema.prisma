@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TestTemplate {
+  id               String       @id @default(uuid())
+  version          String       @default("1.0.0")
+  topic            String
+  difficulty       String
+  duration_minutes Int          @default(90)
+  total_points     Int          @default(30)
+  rubric_version   String       @default("1.0")
+  dotmd_content    String
+  prompt_hash      String
+  createdAt        DateTime     @default(now())
+  submissions      Submission[]
+}
+
+model Submission {
+  id             String       @id @default(uuid())
+  testTemplateId String
+  testTemplate   TestTemplate @relation(fields: [testTemplateId], references: [id])
+  dotmd_filled   String
+  passed         Boolean      @default(false)
+  evaluations    Evaluation[]
+  createdAt      DateTime     @default(now())
+}
+
+model Evaluation {
+  id           String     @id @default(uuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  eval_md      String
+  total_score  Int
+  max_score    Int
+  createdAt    DateTime   @default(now())
+  discussions  DiscussionHistory[]
+}
+
+model DiscussionHistory {
+  id           String     @id @default(uuid())
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  role         String     // "user" or "assistant"
+  content      String
+  createdAt    DateTime   @default(now())
+}
