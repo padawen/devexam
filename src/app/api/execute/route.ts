@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
             try {
                 // Compile with fast-startup JVM flags
-                await execAsync(`javac -J-XX:TieredStopAtLevel=1 Main.java`, { cwd: tempDir, timeout: 10000 });
+                await execAsync(`javac -J-XX:TieredStopAtLevel=1 -J-Xverify:none Main.java`, { cwd: tempDir, timeout: 10000 });
                 // Run with fast-startup JVM flags
                 const { stdout, stderr } = await execAsync(`java -XX:TieredStopAtLevel=1 Main < stdin.txt`, { cwd: tempDir, timeout: 10000 });
 

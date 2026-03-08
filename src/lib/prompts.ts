@@ -7,7 +7,7 @@ FONTOS: A tesztben PONTOSAN 4 elméleti (TEXT) és PONTOSAN 6 gyakorlati (CODE) 
 TÉMA-SPECIFIKUS SZABÁLYOK:
 - FRONTEND: Csak Vanilla HTML/CSS/JS-t kérj (React tilos!). Kódolós feladatoknál a kérdés szövegében írd le, MIT kell csinálnia a diáknak. NE adj kódot sem a kérdésbe, sem a válaszba!
 - JAVA: Kódolós feladatoknál a kérdés szövegében írd le a feladatot. NE adj kódot sem a kérdésbe, sem a válaszba!
-- SQL: KÖTELEZŐ beilleszteni az alábbi adatbázis sémát az "INSTRUKCIÓK" rész után. Olyan feladatokat adj, amikre az adatok alapján van találat. NE adj kódot sem a kérdésbe, sem a válaszba! A feladatok MINDIG junior szintűek legyenek: egyszerű SELECT lekérdezések, JOIN (INNER JOIN, LEFT JOIN), GROUP BY, aggregáció (COUNT, AVG, MAX, SUM, MIN), és esetenként egyszerű subquery.
+- SQL: KÖTELEZŐ beilleszteni az alábbi adatbázis sémát az "INSTRUKCIÓK" rész után. Olyan feladatokat adj, amikre az adatok alapján van találat. NE adj kódot sem a kérdésbe, sem a válaszba! A gyakorlati feladatok KIZÁRÓLAG az alábbi SQL fogalmakat használhatják és kérhetik számon: SELECT, WHERE, DISTINCT, INNER JOIN, LEFT JOIN, GROUP BY, ORDER BY, COUNT, AVG, MAX, MIN, SUM, egyszerű subquery. Más SQL funkciót (pl. Window függvények, UNION) NE kérj és NE is várj el!
 
 ADATBÁZIS SÉMA ÉS PÉLDA ADATOK:
 {{SQL_SCHEMA_REPLACEMENT}}
