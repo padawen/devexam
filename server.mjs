@@ -67,8 +67,7 @@ app.prepare().then(() => {
 
                     try {
                         console.log(`Compiling Java in ${tempDir}...`);
-                        // Force UTF-8 encoding for javac and use fast startup JVM flags
-                        execSync('javac -J-XX:TieredStopAtLevel=1 -J-Xverify:none -encoding UTF-8 Main.java', { cwd: tempDir, timeout: 15000, shell: true });
+                        execSync('javac -J-XX:TieredStopAtLevel=1 -encoding UTF-8 Main.java', { cwd: tempDir, timeout: 15000, shell: true });
                     } catch (compileErr) {
                         const errText = compileErr.stderr?.toString() || compileErr.stdout?.toString() || compileErr.message;
                         console.error('Java Compilation Error:', errText);
@@ -78,7 +77,7 @@ app.prepare().then(() => {
                     }
 
                     console.log('Starting Java child process...');
-                    const javaProc = cpSpawn('java', ['-XX:TieredStopAtLevel=1', '-Xverify:none', '-Dfile.encoding=UTF-8', 'Main'], {
+                    const javaProc = cpSpawn('java', ['-XX:TieredStopAtLevel=1', '-Dfile.encoding=UTF-8', 'Main'], {
                         cwd: tempDir,
                         env: process.env,
                         stdio: ['pipe', 'pipe', 'pipe'],
