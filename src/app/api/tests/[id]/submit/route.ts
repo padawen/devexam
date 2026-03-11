@@ -139,7 +139,7 @@ export async function POST(
             }
         });
 
-        const isComprehensive = testTemplate.topic.toUpperCase() === 'COMPREHENSIVE';
+        const isComprehensive = testTemplate.topic.toUpperCase() === 'COMPREHENSIVE' || testTemplate.topic.toUpperCase() === 'GLASSDOOR';
 
         let totalScore = 0;
         let maxScore = 0;

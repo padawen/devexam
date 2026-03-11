@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { openai } from '@/lib/openai';
-import { GENERATE_TEST_SYSTEM_PROMPT } from '@/lib/prompts';
+import { GENERATE_TEST_SYSTEM_PROMPT, GENERATE_GLASSDOOR_PROMPT, GLASSDOOR_SECTION_RULES } from '@/lib/prompts';
 import { getRandomSqlSchema } from '@/lib/schemas';
 import crypto from 'crypto';
 
@@ -13,22 +13,36 @@ async function generateSection(
     theoryCount: number,
     codeCount: number,
     testId: string,
-    sqlSchema: string
+    sqlSchema: string,
+    useGlassdoorPrompt: boolean = false
 ): Promise<string> {
-    const prompt = GENERATE_TEST_SYSTEM_PROMPT
-        .replace(/{{TOPIC}}/g, topic)
-        .replace(/{{DIFFICULTY}}/g, difficulty)
-        .replace(/{{TEST_ID}}/g, testId)
-        .replace(/{{SQL_SCHEMA_REPLACEMENT}}/g, sqlSchema)
-        // Override the default 10-question / 4-6 split
-        .replace(
-            /Szigorúan pontosan 10 kérdést generálj!.*$/m,
-            `Szigorúan pontosan ${questionCount} kérdést generálj! KÖTELEZŐ eloszlás: pontosan ${theoryCount} elméleti kérdés (jelölés: "type: TEXT") ÉS pontosan ${codeCount} gyakorlati, kódolós feladat (jelölés: "type: CODE").`
-        )
-        .replace(
-            /FONTOS:.*$/m,
-            `FONTOS: A tesztben PONTOSAN ${theoryCount} elméleti (TEXT) és PONTOSAN ${codeCount} gyakorlati (CODE) feladatnak kell lennie!`
-        );
+    let prompt: string;
+
+    if (useGlassdoorPrompt) {
+        const sectionRules = GLASSDOOR_SECTION_RULES[topic] || '';
+        prompt = GENERATE_GLASSDOOR_PROMPT
+            .replace(/{{TOPIC_SECTION}}/g, topic)
+            .replace(/{{QUESTION_COUNT}}/g, String(questionCount))
+            .replace(/{{THEORY_COUNT}}/g, String(theoryCount))
+            .replace(/{{CODE_COUNT}}/g, String(codeCount))
+            .replace(/{{SECTION_RULES}}/g, sectionRules)
+            .replace(/{{TEST_ID}}/g, testId)
+            .replace(/{{SQL_SCHEMA_REPLACEMENT}}/g, sqlSchema);
+    } else {
+        prompt = GENERATE_TEST_SYSTEM_PROMPT
+            .replace(/{{TOPIC}}/g, topic)
+            .replace(/{{DIFFICULTY}}/g, difficulty)
+            .replace(/{{TEST_ID}}/g, testId)
+            .replace(/{{SQL_SCHEMA_REPLACEMENT}}/g, sqlSchema)
+            .replace(
+                /Szigorúan pontosan 10 kérdést generálj!.*$/m,
+                `Szigorúan pontosan ${questionCount} kérdést generálj! KÖTELEZŐ eloszlás: pontosan ${theoryCount} elméleti kérdés (jelölés: "type: TEXT") ÉS pontosan ${codeCount} gyakorlati, kódolós feladat (jelölés: "type: CODE").`
+            )
+            .replace(
+                /FONTOS:.*$/m,
+                `FONTOS: A tesztben PONTOSAN ${theoryCount} elméleti (TEXT) és PONTOSAN ${codeCount} gyakorlati (CODE) feladatnak kell lennie!`
+            );
+    }
 
     const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -51,7 +65,7 @@ async function generateSection(
                 strict: true
             }
         },
-        max_tokens: 2500,
+        max_tokens: useGlassdoorPrompt && topic === 'JAVA' ? 4000 : 2500,
         temperature: 0.7,
     });
 
@@ -63,7 +77,6 @@ async function generateSection(
         console.error(`Failed to parse ${topic} generation:`, e);
         md = `## HIBA - ${topic} generálás sikertelen`;
     }
-    // Strip markdown code block backticks if AI hallucinates them
     md = md.replace(/^```[a-z]*\n/, '').replace(/\n```$/, '');
     return md;
 }
@@ -201,6 +214,52 @@ export async function POST(request: Request) {
             });
 
             console.log('[COMPREHENSIVE] Done! Test ID:', newTest.id);
+
+            return NextResponse.json({
+                id: newTest.id,
+                topic: newTest.topic,
+                difficulty: newTest.difficulty,
+                dotmd_content: newTest.dotmd_content,
+                cached: false
+            });
+        }
+
+        // ─── GLASSDOOR: 3-stage Attention CRM interview ───
+        if (topic.toUpperCase() === 'GLASSDOOR') {
+            const sqlSchemaInfo = getRandomSqlSchema();
+            const sqlSchema = sqlSchemaInfo.description;
+
+            console.log(`[GLASSDOOR] Starting 3-stage generation... (SQL DB: ${sqlSchemaInfo.name})`);
+
+            console.log('[GLASSDOOR] Stage 1/3: Java (15 questions)...');
+            const javaMd = await generateSection('JAVA', 'GLASSDOOR', 15, 8, 7, uuid, '', true);
+
+            console.log('[GLASSDOOR] Stage 2/3: SQL (5 questions)...');
+            const sqlMd = await generateSection('SQL', 'GLASSDOOR', 5, 2, 3, uuid, sqlSchema, true);
+
+            console.log('[GLASSDOOR] Stage 3/3: Frontend (5 questions)...');
+            const frontendMd = await generateSection('FRONTEND', 'GLASSDOOR', 5, 2, 3, uuid, '', true);
+
+            console.log('[GLASSDOOR] Merging results...');
+            const mergedMarkdown = mergeIntoComprehensiveTest(
+                javaMd, sqlMd, frontendMd, uuid, 'GLASSDOOR', sqlSchema, sqlSchemaInfo.index
+            );
+
+            const glassdoorMarkdown = mergedMarkdown
+                .replace('topic: COMPREHENSIVE', 'topic: GLASSDOOR')
+                .replace('duration_minutes: 150', 'duration_minutes: 120');
+
+            const newTest = await prisma.testTemplate.create({
+                data: {
+                    id: uuid,
+                    topic: 'GLASSDOOR',
+                    difficulty: 'GLASSDOOR',
+                    dotmd_content: glassdoorMarkdown,
+                    prompt_hash: promptHash,
+                }
+            });
+
+            console.log('[GLASSDOOR] Done! Test ID:', newTest.id);
 
             return NextResponse.json({
                 id: newTest.id,

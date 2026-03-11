@@ -107,9 +107,9 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
 
     const topic = evaluation?.submission?.testTemplate?.topic ?? '';
     const difficulty = evaluation?.submission?.testTemplate?.difficulty;
-    const isComprehensiveResult = topic.toUpperCase() === 'COMPREHENSIVE';
-    const diffLabel = difficulty === 'EASY' ? 'Könnyű' : difficulty === 'MEDIUM' ? 'Közepes' : 'Nehéz';
-    const topicLabel = isComprehensiveResult ? 'Komplex Vizsga' : topic;
+    const isComprehensiveResult = topic.toUpperCase() === 'COMPREHENSIVE' || topic.toUpperCase() === 'GLASSDOOR';
+    const diffLabel = difficulty === 'EASY' ? 'Könnyű' : difficulty === 'MEDIUM' ? 'Közepes' : difficulty === 'GLASSDOOR' ? '25 kérdés' : 'Nehéz';
+    const topicLabel = topic.toUpperCase() === 'GLASSDOOR' ? '💀 Boss Fight' : isComprehensiveResult ? 'Komplex Vizsga' : topic;
 
     const questions = parseQuestions(
         evaluation?.submission?.testTemplate?.dotmd_content || '',
@@ -117,7 +117,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
         evaluation?.eval_md || ''
     );
 
-    const isCodeTopic = ['JAVA', 'SQL', 'FRONTEND', 'COMPREHENSIVE'].includes(topic.toUpperCase());
+    const isCodeTopic = ['JAVA', 'SQL', 'FRONTEND', 'COMPREHENSIVE', 'GLASSDOOR'].includes(topic.toUpperCase());
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 p-6 flex justify-center">

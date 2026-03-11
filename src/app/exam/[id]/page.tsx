@@ -257,7 +257,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         });
     };
 
-    const isComprehensive = template?.topic?.toUpperCase() === 'COMPREHENSIVE';
+    const isComprehensive = template?.topic?.toUpperCase() === 'COMPREHENSIVE' || template?.topic?.toUpperCase() === 'GLASSDOOR';
     const isSQL = template?.topic?.toUpperCase() === 'SQL' || isComprehensive;
     let schemaContent: string | null = null;
     const renderParts = parts.map((part) => cleanMarkdown(part));
@@ -299,8 +299,9 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
             <LoadingModal isOpen={submitting} text="Teszt értékelése folyamatban... Kérlek várj." />
             <div className="bg-white/80 backdrop-blur-md border-b border-slate-200 py-3 px-6 text-center shadow-sm">
                 <span className="text-sm font-bold text-slate-700 tracking-wider uppercase">
-                    {isComprehensive ? 'Komplex Vizsga' : template?.topic} • {template?.topic === 'SQL' ? 'Junior' : (template?.difficulty === 'EASY' ? 'Könnyű' : template?.difficulty === 'MEDIUM' ? 'Közepes' : 'Nehéz')}
-                    {isComprehensive && ' • 150 perc'}
+                    {template?.topic?.toUpperCase() === 'GLASSDOOR' ? '💀 Boss Fight' : isComprehensive ? 'Komplex Vizsga' : template?.topic} • {template?.topic === 'SQL' ? 'Junior' : template?.topic?.toUpperCase() === 'GLASSDOOR' ? '25 kérdés' : (template?.difficulty === 'EASY' ? 'Könnyű' : template?.difficulty === 'MEDIUM' ? 'Közepes' : 'Nehéz')}
+                    {template?.topic?.toUpperCase() === 'GLASSDOOR' && ' • 120 perc'}
+                    {isComprehensive && template?.topic?.toUpperCase() !== 'GLASSDOOR' && ' • 150 perc'}
                 </span>
             </div>
 
