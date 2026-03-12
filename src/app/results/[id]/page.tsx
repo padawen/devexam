@@ -126,8 +126,8 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                 {/* Header */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Értékelési jelentés</h1>
-                        <p className="text-slate-500 mt-1 font-medium">{topicLabel} · {diffLabel}</p>
+                        <h1 className="text-4xl font-bold text-slate-900">Értékelési jelentés</h1>
+                        <p className="text-lg text-slate-500 mt-1 font-medium">{topicLabel} · {diffLabel}</p>
                     </div>
                     <div className="text-right">
                         <div className={`text-5xl font-black ${scoreColor}`}>
@@ -160,27 +160,27 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                         <div key={q.index} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-8">
                             {/* Header: Question Number and Score */}
                             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                                <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                                <h3 className="text-base font-bold text-slate-700 uppercase tracking-wider">
                                     {q.index}. Kérdés
                                 </h3>
                                 <div className="flex gap-2 items-center">
-                                    {score && <span className="text-sm font-bold text-slate-500 bg-slate-200/50 px-2 py-1 rounded-md">{score}</span>}
-                                    {status && <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter ${statusClass}`}>{status}</span>}
+                                    {score && <span className="text-base font-bold text-slate-500 bg-slate-200/50 px-3 py-1.5 rounded-md">{score}</span>}
+                                    {status && <span className={`text-xs font-black px-3 py-1.5 rounded-md uppercase tracking-tighter ${statusClass}`}>{status}</span>}
                                 </div>
                             </div>
 
                             <div className="p-6 space-y-6">
                                 {/* Question Text */}
                                 <div>
-                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Feladat</h4>
-                                    <div className="prose prose-slate prose-sm max-w-none text-slate-600">
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Feladat</h4>
+                                    <div className="prose prose-slate prose-base max-w-none text-slate-600">
                                         <ReactMarkdown>{q.questionText}</ReactMarkdown>
                                     </div>
                                 </div>
 
                                 {/* User Answer */}
                                 <div>
-                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Válaszod</h4>
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Válaszod</h4>
                                     {q.answerText ? (
                                         isCodeTopic ? (
                                             <div className="space-y-4">
@@ -188,7 +188,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                                                     <div className="absolute -top-3 right-4 px-2 py-1 bg-slate-800 text-[10px] text-slate-400 rounded-md font-mono z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         {topic.toLowerCase()}
                                                     </div>
-                                                    <pre className="bg-slate-900 text-slate-300 rounded-xl p-5 text-xs font-mono overflow-x-auto whitespace-pre border border-slate-800 shadow-inner max-h-[400px]">
+                                                    <pre className="bg-slate-900 text-slate-300 rounded-xl p-5 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words border border-slate-800 shadow-inner max-h-[400px]">
                                                         {q.answerText}
                                                     </pre>
                                                 </div>
@@ -214,7 +214,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="prose prose-slate prose-sm max-w-none p-4 bg-slate-50 rounded-xl border border-slate-100 text-slate-700">
+                                            <div className="prose prose-slate prose-base max-w-none p-4 bg-slate-50 rounded-xl border border-slate-100 text-slate-700">
                                                 <ReactMarkdown>{q.answerText}</ReactMarkdown>
                                             </div>
                                         )
@@ -226,8 +226,8 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                                 {/* AI Feedback */}
                                 {q.aiFeedback && (
                                     <div className="pt-6 border-t border-slate-100">
-                                        <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-3">Értékelés & Visszajelzés</h4>
-                                        <div className="prose prose-emerald prose-sm max-w-none italic text-slate-600 bg-emerald-50/30 p-4 rounded-xl border border-emerald-100/50">
+                                        <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">Értékelés & Visszajelzés</h4>
+                                        <div className="prose prose-emerald prose-base max-w-none italic text-slate-600 bg-emerald-50/30 p-4 rounded-xl border border-emerald-100/50">
                                             <ReactMarkdown>
                                                 {q.aiFeedback
                                                     .replace(/Pontszám:.*?\n/i, '')
